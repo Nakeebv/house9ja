@@ -1,0 +1,409 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  TENANT
+  LANDLORD
+  AGENT
+  ADMIN
+}
+
+enum PropertyType {
+  APARTMENT
+  DUPLEX
+  SELF_CONTAINED
+  BUNGALOW
+  SHARED_APARTMENT
+  STUDENT_HOUSING
+  HOSTEL
+  TERRACE
+  MANSIONETTE
+}
+
+enum Furnishing {
+  FURNISHED
+  SEMI_FURNISHED
+  UNFURNISHED
+}
+
+enum ReportStatus {
+  PENDING
+  RESOLVED
+  DISMISSED
+}
+
+enum ReportType {
+  SCAM
+  INAPPROPRIATE
+  MISLEADING
+  OTHER
+}
+
+enum BookingStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  RESCHEDULED
+}
+
+enum LeadStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  AUDIO
+  PDF
+  VIDEO
+}
+
+enum PriceType {
+  MONTHLY
+  YEARLY
+}
+
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum AgreementStatus {
+  DRAFT
+  PENDING_TENANT
+  SIGNED
+  CANCELLED
+}
+
+enum AdminRequestType {
+  DOCUMENT
+  QUESTION
+  VERIFICATION
+  GENERAL
+}
+
+enum AdminRequestStatus {
+  OPEN
+  PENDING_USER
+  PENDING_ADMIN
+  RESOLVED
+  CLOSED
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  phone         String    @unique
+  passwordHash  String?
+  firstName     String
+  lastName      String
+  role          UserRole
+  isVerified    Boolean   @default(false)
+  isVerifiedLandlord Boolean  @default(false)
+  isBlocked     Boolean   @default(false)
+  avatarUrl     String?
+  emailVerified          Boolean   @default(false)
+  emailVerificationToken String?
+  emailVerificationExpiry DateTime?
+  acceptedTerms         Boolean   @default(false)
+  failedLoginAttempts   Int       @default(0)
+  lockedUntil           DateTime?
+  otpCode               String?
+  otpExpiresAt          DateTime?
+  otpAttempts           Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  properties    Property[]
+  listingsPosted Property[]  @relation("AgentListings")
+  tenantChats   Chat[]       @relation("TenantChats")
+  landlordChats Chat[]       @relation("LandlordChats")
+  messages      Message[]
+  reportsMade   Report[]     @relation("Reporter")
+  reportsAgainst Report[]    @relation("ReportedUser")
+
+  favorites     Favorite[]
+  bookingsAsTenant   Booking[] @relation("TenantBookings")
+  bookingsAsLandlord Booking[] @relation("LandlordBookings")
+  verificationDoc VerificationDocument?
+  agreementsAsTenant   Agreement[] @relation("TenantAgreements")
+  agreementsAsLandlord Agreement[] @relation("LandlordAgreements")
+  notifications Notification[]
+  leadsAsTenant Lead[]        @relation("TenantLeads")
+  leadsAsAgent  Lead[]        @relation("AgentLeads")
+  adminRequestsSent     AdminRequest[] @relation("AdminRequestsSent")
+  adminRequestsReceived AdminRequest[] @relation("AdminRequestsReceived")
+  adminRequestMessages  AdminRequestMessage[] @relation("AdminRequestMessages")
+
+  @@index([email, phone])
+  @@map("users")
+}
+
+model Property {
+  id              String      @id @default(cuid())
+  title           String
+  description     String?
+  address         String
+  state           String
+  city            String
+  area            String
+  latitude        Float
+  longitude       Float
+  propertyType    PropertyType
+  bedrooms        Int
+  bathrooms       Int
+  furnishing      Furnishing  @default(UNFURNISHED)
+  monthlyRent     Decimal     @db.Decimal(15,2)
+  priceType       PriceType   @default(YEARLY)
+  isAvailable     Boolean     @default(true)
+  images          String[]    @default([])
+  features        String[]    @default([])
+  landlordId      String
+  agentId         String?
+  views           Int         @default(0)
+  isVerified      Boolean     @default(false)
+  isFlagged       Boolean     @default(false)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  deletedAt       DateTime?
+
+  landlord        User        @relation(fields: [landlordId], references: [id], onDelete: Cascade)
+  agent           User?       @relation("AgentListings", fields: [agentId], references: [id])
+  chats           Chat[]
+  reports         Report[]
+  favorites       Favorite[]
+  bookings        Booking[]
+  agreements      Agreement[]
+  leads           Lead[]
+
+  @@index([state, city, area])
+  @@index([monthlyRent])
+  @@index([latitude, longitude])
+  @@map("properties")
+}
+
+model Chat {
+  id          String    @id @default(cuid())
+  propertyId  String
+  tenantId    String
+  landlordId  String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  property    Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  tenant      User      @relation("TenantChats", fields: [tenantId], references: [id], onDelete: Cascade)
+  landlord    User      @relation("LandlordChats", fields: [landlordId], references: [id], onDelete: Cascade)
+  messages    Message[]
+
+  @@unique([propertyId, tenantId, landlordId])
+  @@map("chats")
+}
+
+model Message {
+  id        String      @id @default(cuid())
+  chatId    String
+  senderId  String
+  content   String
+  type      MessageType @default(TEXT)
+  mediaUrl  String?
+  isRead    Boolean     @default(false)
+  createdAt DateTime    @default(now())
+
+  chat      Chat        @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  sender    User        @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model Lead {
+  id          String     @id @default(cuid())
+  propertyId  String
+  tenantId    String
+  agentId     String
+  message     String?
+  status      LeadStatus @default(PENDING)
+  chatId      String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  property    Property   @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  tenant      User       @relation("TenantLeads", fields: [tenantId], references: [id], onDelete: Cascade)
+  agent       User       @relation("AgentLeads", fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@unique([propertyId, tenantId])
+  @@map("leads")
+}
+
+model Report {
+  id          String       @id @default(cuid())
+  reporterId  String
+  reportedId  String?
+  propertyId  String?
+  type        ReportType
+  description String
+  status      ReportStatus @default(PENDING)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  reporter    User      @relation("Reporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  reported    User?     @relation("ReportedUser", fields: [reportedId], references: [id], onDelete: SetNull)
+  property    Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+
+  @@map("reports")
+}
+
+model Favorite {
+  id          String   @id @default(cuid())
+  userId      String
+  propertyId  String
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, propertyId])
+  @@map("favorites")
+}
+
+model Booking {
+  id          String        @id @default(cuid())
+  propertyId  String
+  tenantId    String
+  landlordId  String
+  date        String
+  time        String
+  status      BookingStatus @default(PENDING)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  tenant      User     @relation("TenantBookings", fields: [tenantId], references: [id], onDelete: Cascade)
+  landlord    User     @relation("LandlordBookings", fields: [landlordId], references: [id], onDelete: Cascade)
+
+  @@map("bookings")
+}
+
+model VerificationDocument {
+  id                  String             @id @default(cuid())
+  landlordId          String             @unique
+  governmentIdUrl     String
+  backOfIdUrl         String?
+  selfieWithIdUrl     String?
+  proofOfOwnershipUrl String?
+  utilityBillUrl      String?
+  rejectionReason     String?
+  requiresMoreDocs    Boolean            @default(false)
+  status              VerificationStatus @default(PENDING)
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  landlord            User               @relation(fields: [landlordId], references: [id], onDelete: Cascade)
+
+  @@map("verification_documents")
+}
+
+model AdminRequest {
+  id        String             @id @default(cuid())
+  adminId   String
+  userId    String
+  type      AdminRequestType
+  subject   String
+  status    AdminRequestStatus @default(OPEN)
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  admin     User               @relation("AdminRequestsSent", fields: [adminId], references: [id])
+  user      User               @relation("AdminRequestsReceived", fields: [userId], references: [id])
+  messages  AdminRequestMessage[]
+
+  @@index([userId])
+  @@index([adminId])
+  @@index([status])
+  @@map("admin_requests")
+}
+
+model AdminRequestMessage {
+  id            String       @id @default(cuid())
+  requestId     String
+  senderId      String
+  message       String?
+  attachmentUrl String?
+  createdAt     DateTime     @default(now())
+
+  request       AdminRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  sender        User         @relation("AdminRequestMessages", fields: [senderId], references: [id])
+
+  @@index([requestId])
+  @@map("admin_request_messages")
+}
+
+model Agreement {
+  id          String          @id @default(cuid())
+  propertyId  String
+  tenantId    String
+  landlordId  String
+  rentAmount  Decimal         @db.Decimal(15,2)
+  duration    String
+  terms       String
+  status      AgreementStatus @default(DRAFT)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  tenant      User     @relation("TenantAgreements", fields: [tenantId], references: [id], onDelete: Cascade)
+  landlord    User     @relation("LandlordAgreements", fields: [landlordId], references: [id], onDelete: Cascade)
+
+  @@map("agreements")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String
+  isRead    Boolean  @default(false)
+  linkUrl   String?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model Inquiry {
+  id            String   @id @default(cuid())
+  fullName      String
+  phone         String
+  preferredArea String
+  budgetRange   String
+  preferredDate String
+  description   String?
+  createdAt     DateTime @default(now())
+
+  @@map("inquiries")
+}
+
+model BroadcastLog {
+  id          String   @id @default(cuid())
+  subject     String
+  message     String
+  sentBy      String
+  targetType  String   @default("ALL")  // ALL | ROLE | USERS
+  targetMeta  String?                   // role name or comma-separated user IDs
+  sentCount   Int      @default(0)
+  failCount   Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  @@map("broadcast_logs")
+}

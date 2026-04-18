@@ -1,0 +1,48 @@
+{
+  "name": "rentnaija",
+  "version": "0.1.0",
+  "description": "RentNaija - P2P Property Rental Platform for Nigeria",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"cd rentnaija-backend && npm run dev\" \"cd rentnaija-frontend && npm run dev\"",
+    "dev:backend": "cd rentnaija-backend && npm run dev",
+    "dev:frontend": "cd rentnaija-frontend && npm run dev",
+    "build": "cd rentnaija-backend && npm run build && cd ../rentnaija-frontend && npm run build",
+    "build:backend": "cd rentnaija-backend && npm run build",
+    "build:frontend": "cd rentnaija-frontend && npm run build",
+    "start": "concurrently \"cd rentnaija-backend && npm run start\" \"cd rentnaija-frontend && npm run start\"",
+    "start:backend": "cd rentnaija-backend && npm run start",
+    "start:frontend": "cd rentnaija-frontend && npm run start",
+    "install:all": "npm install && cd rentnaija-backend && npm install && cd ../rentnaija-frontend && npm install",
+    "clean": "rm -rf rentnaija-backend/node_modules rentnaija-frontend/node_modules node_modules",
+    "docker:build": "cd rentnaija-backend && docker build -t rentnaija-backend . && cd ../rentnaija-frontend && docker build -t rentnaija-frontend .",
+    "test": "cd rentnaija-backend && npm run test && cd ../rentnaija-frontend && npm run test",
+    "lint": "cd rentnaija-backend && npm run lint && cd ../rentnaija-frontend && npm run lint",
+    "db:migrate": "cd rentnaija-backend && npm run db:migrate",
+    "db:studio": "cd rentnaija-backend && npm run db:studio"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "rental",
+    "property",
+    "nigeria",
+    "p2p",
+    "real-estate",
+    "nestjs",
+    "nextjs",
+    "react",
+    "typescript"
+  ],
+  "author": "RentNaija Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/damcospace/rentnaija.git"
+  },
+  "bugs": {
+    "url": "https://github.com/damcospace/rentnaija/issues"
+  },
+  "homepage": "https://github.com/damcospace/rentnaija#readme"
+}

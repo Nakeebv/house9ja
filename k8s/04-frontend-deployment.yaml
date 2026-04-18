@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rentnaija-frontend
+  namespace: rentnaija
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rentnaija-frontend
+  template:
+    metadata:
+      labels:
+        app: rentnaija-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: rentnaija-frontend:latest
+        ports:
+        - containerPort: 3000

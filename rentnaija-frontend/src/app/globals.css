@@ -1,0 +1,175 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Apple-inspired design tokens ───────────────────────────────────────────── */
+:root {
+  /* Backgrounds */
+  --bg:          #ffffff;
+  --bg-alt:      #f5f5f7;
+  --bg-raised:   #ffffff;
+  --bg-overlay:  rgba(255, 255, 255, 0.72);
+
+  /* Text */
+  --text-primary:    #1d1d1f;
+  --text-secondary:  #6e6e73;
+  --text-tertiary:   #86868b;
+
+  /* Accent — Apple blue */
+  --accent:           #0071e3;
+  --accent-hover:     #0077ed;
+  --accent-fg:        #ffffff;
+
+  /* Borders */
+  --border:        rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.16);
+
+  /* Shadows */
+  --shadow-sm:  0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md:  0 8px 30px rgba(0, 0, 0, 0.10);
+  --shadow-lg:  0 24px 64px rgba(0, 0, 0, 0.12);
+  --shadow-xl:  0 40px 100px rgba(0, 0, 0, 0.14);
+
+  /* Component tokens (shadcn compatibility) */
+  --background:            0 0% 100%;
+  --foreground:            0 0% 11%;
+  --card:                  0 0% 100%;
+  --card-foreground:       0 0% 11%;
+  --popover:               0 0% 100%;
+  --popover-foreground:    0 0% 11%;
+  --muted:                 0 0% 96%;
+  --muted-foreground:      0 0% 43%;
+  --accent:                210 100% 45%;
+  --accent-foreground:     0 0% 100%;
+  --destructive:           0 84% 60%;
+  --destructive-foreground:0 0% 100%;
+  --border:                0 0% 90%;
+  --input:                 0 0% 90%;
+  --primary:               210 100% 45%;
+  --primary-foreground:    0 0% 100%;
+  --secondary:             0 0% 96%;
+  --secondary-foreground:  0 0% 11%;
+  --ring:                  210 100% 45%;
+  --radius:                0.75rem;
+}
+
+.dark {
+  /* Backgrounds */
+  --bg:          #000000;
+  --bg-alt:      #1d1d1f;
+  --bg-raised:   #2d2d2f;
+  --bg-overlay:  rgba(0, 0, 0, 0.72);
+
+  /* Text */
+  --text-primary:    #f5f5f7;
+  --text-secondary:  #a1a1a6;
+  --text-tertiary:   #6e6e73;
+
+  /* Accent — Apple blue (brighter in dark) */
+  --accent:           #2997ff;
+  --accent-hover:     #409cff;
+  --accent-fg:        #000000;
+
+  /* Borders */
+  --border:        rgba(255, 255, 255, 0.10);
+  --border-strong: rgba(255, 255, 255, 0.18);
+
+  /* Shadows */
+  --shadow-sm:  0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md:  0 8px 30px rgba(0, 0, 0, 0.5);
+  --shadow-lg:  0 24px 64px rgba(0, 0, 0, 0.6);
+  --shadow-xl:  0 40px 100px rgba(0, 0, 0, 0.7);
+
+  /* Component tokens */
+  --background:            0 0% 0%;
+  --foreground:            0 0% 96%;
+  --card:                  0 0% 11%;
+  --card-foreground:       0 0% 96%;
+  --popover:               0 0% 11%;
+  --popover-foreground:    0 0% 96%;
+  --muted:                 0 0% 14%;
+  --muted-foreground:      0 0% 63%;
+  --accent:                210 100% 65%;
+  --accent-foreground:     0 0% 0%;
+  --destructive:           0 84% 60%;
+  --destructive-foreground:0 0% 100%;
+  --border:                0 0% 18%;
+  --input:                 0 0% 18%;
+  --primary:               210 100% 65%;
+  --primary-foreground:    0 0% 0%;
+  --secondary:             0 0% 14%;
+  --secondary-foreground:  0 0% 96%;
+  --ring:                  210 100% 65%;
+}
+
+/* ── Base resets ─────────────────────────────────────────────────────────────── */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text-primary);
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.015em;
+    line-height: 1.1;
+  }
+
+  ::selection {
+    background-color: #0071e3;
+    color: #ffffff;
+  }
+
+  .dark ::selection {
+    background-color: #2997ff;
+    color: #000000;
+  }
+
+  :focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--accent);
+  }
+}
+
+/* ── Ken Burns hero animation ───────────────────────────────────────────────── */
+@keyframes kenBurns {
+  from { transform: scale(1.0); }
+  to   { transform: scale(1.06); }
+}
+
+/* ── Fade up animation ──────────────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-fade-up-delay-1 { animation-delay: 0.1s; }
+.animate-fade-up-delay-2 { animation-delay: 0.2s; }
+.animate-fade-up-delay-3 { animation-delay: 0.3s; }
+.animate-fade-up-delay-4 { animation-delay: 0.45s; }
+
+/* ── Apple-style section divider ─────────────────────────────────────────────── */
+.section-divider {
+  border-top: 1px solid var(--border);
+}
+
+/* ── Clean scrollbar ────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }

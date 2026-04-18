@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rentnaija-ingress
+  namespace: rentnaija
+spec:
+  rules:
+  - host: rentnaija.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: rentnaija-frontend
+            port:
+              number: 3000
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: rentnaija-backend
+            port:
+              number: 3001
