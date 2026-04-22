@@ -55,10 +55,14 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
 
   if (!response.ok) {
     if (response.status === 401 && typeof window !== 'undefined') {
+      const hadToken = !!localStorage.getItem('rentnaija_token')
       localStorage.removeItem('rentnaija_token')
-      window.location.href = '/'
-      // Throw to halt any further processing in the caller
-      throw new ApiError('Session expired', 401, data)
+      if (hadToken) {
+        // Session expired — boot to welcome page
+        window.location.href = '/'
+        throw new ApiError('Session expired', 401, data)
+      }
+      // No token = fresh auth request (login/register), let error propagate normally
     }
 
     const message =
