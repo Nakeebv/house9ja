@@ -2,29 +2,25 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-RUN npm install -g pnpm
-
-COPY package.json pnpm-lock.yaml* ./
-RUN pnpm install --frozen-lockfile
+COPY package*.json ./
+RUN npm ci
 
 COPY . .
-RUN pnpm run build
+RUN npm run build
 
 FROM node:20-alpine
 
 WORKDIR /app
-
-RUN npm install -g pnpm
 ENV NODE_ENV=production
 
-COPY package.json pnpm-lock.yaml* ./
-RUN pnpm install --frozen-lockfile --prod
+COPY package*.json ./
+RUN npm ci --omit=dev
 
-COPY --from=builder --chown=node:node /app/dist ./dist
-COPY --from=builder --chown=node:node /app/prisma ./prisma
-COPY --chown=node:node package.json ./
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
+
+RUN npm install -g prisma
 
 EXPOSE 3001
-USER node
 
 CMD ["node", "dist/main.js"]

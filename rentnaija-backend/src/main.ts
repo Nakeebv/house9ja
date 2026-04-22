@@ -20,7 +20,7 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
   const host = process.env.BACKEND_HOST ?? '0.0.0.0';
-  const port = Number(process.env.BACKEND_PORT ?? 3001);
+  const port = Number(process.env.PORT ?? process.env.BACKEND_PORT ?? 3001);
 
   app.use(helmet());
   app.enableShutdownHooks();
