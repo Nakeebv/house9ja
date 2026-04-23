@@ -13,7 +13,6 @@ import { api } from '@/lib/api'
 
 declare global {
   interface Window {
-    google: any
     initPlacesAutocomplete?: () => void
   }
 }
