@@ -144,6 +144,26 @@ export class EmailService {
     `));
   }
 
+  async sendPasswordResetEmail(to: string, firstName: string, token: string) {
+    const link = `${this.appUrl}/reset-password?token=${token}`;
+    return this.send(to, 'Reset your House9ja password', this.layout(`
+      <p style="margin:0 0 4px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#dc2626">Password Reset</p>
+      <h1 style="margin:0 0 12px;font-size:24px;font-weight:700;color:#0f172a;line-height:1.3">Reset your password</h1>
+      <p style="margin:0 0 24px;font-size:15px;color:#475569;line-height:1.7">
+        Hi <strong>${firstName}</strong>, we received a request to reset your House9ja password. Click the button below to choose a new one.
+      </p>
+      ${this.btn(link, 'Reset Password')}
+      <p style="margin:0;font-size:13px;color:#94a3b8;line-height:1.7">
+        This link expires in <strong style="color:#64748b">1 hour</strong>.<br/>
+        If you didn't request a password reset, you can safely ignore this email — your account is secure.
+      </p>
+      ${this.divider()}
+      <p style="margin:0;font-size:12px;color:#cbd5e1;word-break:break-all">
+        Or copy: <a href="${link}" style="color:#93c5fd;text-decoration:none">${link}</a>
+      </p>
+    `));
+  }
+
   async sendMoreDocsEmail(to: string, firstName: string, adminMessage: string) {
     return this.send(to, 'Action Required: Additional Documents Needed', this.layout(`
       <p style="margin:0 0 4px;font-size:13px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#d97706">Action Required</p>

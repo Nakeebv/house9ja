@@ -25,6 +25,7 @@ enum PropertyType {
   HOSTEL
   TERRACE
   MANSIONETTE
+  OFFICE
 }
 
 enum Furnishing {
@@ -121,6 +122,8 @@ model User {
   otpCode               String?
   otpExpiresAt          DateTime?
   otpAttempts           Int       @default(0)
+  resetToken            String?
+  resetTokenExpiry      DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   deletedAt     DateTime?

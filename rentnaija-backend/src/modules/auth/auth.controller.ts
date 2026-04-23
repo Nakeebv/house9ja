@@ -54,6 +54,18 @@ export class AuthController {
     return this.authService.resendVerification(body.email);
   }
 
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  @Post('forgot-password')
+  forgotPassword(@Body() body: { email: string }) {
+    return this.authService.forgotPassword(body.email);
+  }
+
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  @Post('reset-password')
+  resetPassword(@Body() body: { token: string; password: string }) {
+    return this.authService.resetPassword(body.token, body.password);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get('me')
   getMe(@Request() req: any) {

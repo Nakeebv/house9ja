@@ -20,6 +20,7 @@ const PROPERTY_TYPES = [
   { value: 'HOSTEL', label: 'Hostel' },
   { value: 'TERRACE', label: 'Terrace' },
   { value: 'MANSIONETTE', label: 'Mansionette' },
+  { value: 'OFFICE', label: 'Office' },
 ]
 
 const FURNISHING_OPTIONS = [
@@ -188,7 +189,7 @@ export default function AddListingPage() {
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-300">Monthly Rent (₦)</label>
+                <label className="text-sm font-medium text-slate-300">Yearly Rent (₦)</label>
                 <Input required type="number" min="1" value={form.monthlyRent} onChange={set('monthlyRent')} placeholder="Enter amount..." className="h-12 rounded-xl border-slate-800 bg-slate-900 text-white" />
               </div>
             </div>

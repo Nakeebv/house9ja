@@ -257,6 +257,40 @@ export class AuthService {
     return { status: 'success', data: { message: 'Verification email sent.' } };
   }
 
+  async forgotPassword(email: string) {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    // Always return success to prevent email enumeration
+    if (!user || !user.emailVerified || user.deletedAt) {
+      return { status: 'success', data: { message: 'If that account exists, a reset link has been sent.' } };
+    }
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const expiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { resetToken, resetTokenExpiry: expiry },
+    });
+
+    await this.email.sendPasswordResetEmail(user.email, user.firstName, resetToken);
+    return { status: 'success', data: { message: 'If that account exists, a reset link has been sent.' } };
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    const user = await this.prisma.user.findFirst({
+      where: { resetToken: token, resetTokenExpiry: { gt: new Date() } },
+    });
+    if (!user) throw new BadRequestException('Invalid or expired reset link. Please request a new one.');
+
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { passwordHash, resetToken: null, resetTokenExpiry: null, failedLoginAttempts: 0, lockedUntil: null },
+    });
+
+    return { status: 'success', data: { message: 'Password reset successfully. You can now sign in.' } };
+  }
+
   async validateUser(userId: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },

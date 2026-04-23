@@ -21,6 +21,7 @@ const PROPERTY_TYPES = [
   { value: 'HOSTEL', label: 'Hostel' },
   { value: 'TERRACE', label: 'Terrace' },
   { value: 'MANSIONETTE', label: 'Mansionette' },
+  { value: 'OFFICE', label: 'Office' },
 ]
 
 const FURNISHING_OPTIONS = [
