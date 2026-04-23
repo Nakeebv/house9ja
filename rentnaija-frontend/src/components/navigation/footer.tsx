@@ -52,7 +52,7 @@ export function Footer() {
 
             <div className="mt-6 space-y-1.5 text-[13px] text-[#86868b] dark:text-[#6e6e73]">
               <p>support@house9ja.com</p>
-              <p>Lekki, Lagos, Nigeria</p>
+              <p>Wuse II, Abuja, Nigeria</p>
             </div>
           </div>
 

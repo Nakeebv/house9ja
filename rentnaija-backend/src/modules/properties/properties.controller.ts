@@ -7,6 +7,11 @@ import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 export class PropertiesController {
   constructor(private readonly propertiesService: PropertiesService) {}
 
+  @Get('city-counts')
+  getCityCounts() {
+    return this.propertiesService.getCityCounts();
+  }
+
   @Get()
   search(@Query() query: any) {
     return this.propertiesService.search({

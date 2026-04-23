@@ -6,6 +6,18 @@ import { Prisma } from '@prisma/client';
 export class PropertiesService {
   constructor(private prisma: PrismaService) { }
 
+  async getCityCounts() {
+    const cities = ['Lagos', 'Abuja', 'Ibadan', 'Port Harcourt'];
+    const counts = await Promise.all(
+      cities.map((city) =>
+        this.prisma.property.count({
+          where: { deletedAt: null, isAvailable: true, isVerified: true, isFlagged: false, city: { contains: city, mode: Prisma.QueryMode.insensitive } },
+        }),
+      ),
+    );
+    return Object.fromEntries(cities.map((city, i) => [city, counts[i]]));
+  }
+
   async search(params: {
     query?: string; location?: string; type?: string;
     minPrice?: number; maxPrice?: number; bedrooms?: number;

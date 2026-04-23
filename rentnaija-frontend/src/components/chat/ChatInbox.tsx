@@ -578,7 +578,7 @@ export function ChatInbox({ conversations, currentUserId, token }: ChatInboxProp
                 onKeyDown={handleTyping}
                 placeholder={pendingFile ? 'Click send to upload file…' : 'Type a message…'}
                 disabled={!!pendingFile}
-                className="flex-1 h-10 rounded-full bg-white/6 border-white/10 text-white placeholder:text-slate-500 focus-visible:ring-blue-500 focus-visible:ring-1 px-4 disabled:opacity-50"
+                className="flex-1 h-10 rounded-full bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus-visible:ring-blue-500 focus-visible:ring-1 px-4 disabled:opacity-50"
               />
               <Button
                 type="submit"
