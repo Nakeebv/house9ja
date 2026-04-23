@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import {
   ShieldCheck, MessageCircle, CalendarCheck,
-  Layers, MapPin, CheckCircle,
+  Layers, MapPin, ArrowUpRight, CheckCircle,
 } from 'lucide-react'
 import { HeroImageShowcase } from '@/components/home/hero-image-showcase'
 import { FeaturedListings } from '@/components/home/featured-listings'
