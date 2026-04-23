@@ -69,6 +69,7 @@ enum MessageType {
 }
 
 enum PriceType {
+  DAILY
   MONTHLY
   YEARLY
 }

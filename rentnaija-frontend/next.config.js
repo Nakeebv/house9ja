@@ -2,6 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  productionBrowserSourceMaps: false,
   images: {
     // Serve local images with a long cache TTL
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
