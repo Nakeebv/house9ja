@@ -207,7 +207,7 @@ export function Navbar() {
 
       {/* Mobile drawer */}
       {open && (
-        <div className="border-t border-black/8 bg-white/96 px-5 pb-6 pt-3 backdrop-blur-xl dark:border-white/8 dark:bg-black/96 md:hidden">
+        <div className="border-t border-black/8 bg-white px-5 pb-6 pt-3 backdrop-blur-xl dark:border-white/8 dark:bg-[#111111] md:hidden">
           <div className="flex flex-col gap-0.5">
             {NAV.map(({ href, label, icon: Icon }) => (
               <Link

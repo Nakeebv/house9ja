@@ -79,7 +79,7 @@ export default function HomePage() {
             {/* Large card */}
             <div className="group relative min-h-[420px] overflow-hidden rounded-2xl">
               <Image
-                src="/hero/img-a2.png"
+                src="/hero/Gemini_Generated_Image_qzwgt6qzwgt6qzwg.png"
                 alt="Modern apartment complex"
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
@@ -106,7 +106,7 @@ export default function HomePage() {
             <div className="flex flex-col gap-5">
               <div className="group relative h-[200px] overflow-hidden rounded-2xl">
                 <Image
-                  src="/hero/img-a4.png"
+                  src="/hero/Gemini_Generated_Image_mbsz5ombsz5ombsz.png"
                   alt="Premium apartment interior"
                   fill
                   sizes="(max-width: 1024px) 100vw, 50vw"
@@ -121,7 +121,7 @@ export default function HomePage() {
 
               <div className="group relative h-[200px] overflow-hidden rounded-2xl">
                 <Image
-                  src="/hero/img-a5.png"
+                  src="/hero/b_an_africa_lady_inspe.png"
                   alt="Urban building"
                   fill
                   sizes="(max-width: 1024px) 100vw, 50vw"
