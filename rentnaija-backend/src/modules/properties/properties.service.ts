@@ -1,11 +1,12 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { EmailService } from '../email/email.service';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class PropertiesService {
-  constructor(private prisma: PrismaService, private notifications: NotificationsService) { }
+  constructor(private prisma: PrismaService, private notifications: NotificationsService, private email: EmailService) { }
 
   async getCityCounts() {
     const cities = ['Lagos', 'Abuja', 'Ibadan', 'Port Harcourt'];
@@ -128,7 +129,7 @@ export class PropertiesService {
       throw new ForbiddenException('Your account must be verified before you can post listings. Please submit your verification documents.');
     }
 
-    return this.prisma.property.create({
+    const property = await this.prisma.property.create({
       data: {
         ...data,
         landlordId,
@@ -136,6 +137,20 @@ export class PropertiesService {
         furnishing: data.furnishing?.toUpperCase() ?? 'UNFURNISHED',
       },
     });
+
+    // Notify admins of new listing (fire-and-forget)
+    this.prisma.user.findMany({ where: { role: 'ADMIN' } }).then((admins) =>
+      Promise.all(admins.map((admin) =>
+        this.email.sendNotificationEmail(
+          admin.email, admin.firstName,
+          '🏠 New Listing Submitted',
+          `"${property.title}" was submitted by user ${landlordId} and is awaiting approval.`,
+          `${process.env.FRONTEND_URL ?? 'https://house9ja.com'}/admin/properties`,
+        ).catch(() => {}),
+      )),
+    ).catch(() => {});
+
+    return property;
   }
 
   async update(id: string, userId: string, data: any) {

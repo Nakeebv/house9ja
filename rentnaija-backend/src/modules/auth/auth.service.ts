@@ -78,6 +78,18 @@ export class AuthService {
 
     await this.email.sendVerificationEmail(user.email, user.firstName, verificationToken);
 
+    // Notify all admins of new registration (fire-and-forget)
+    this.prisma.user.findMany({ where: { role: 'ADMIN' } }).then((admins) =>
+      Promise.all(admins.map((admin) =>
+        this.email.sendNotificationEmail(
+          admin.email, admin.firstName,
+          '🆕 New User Registration',
+          `${data.firstName} ${data.lastName} (${data.role}) just registered with ${data.email}.`,
+          `${process.env.FRONTEND_URL ?? 'https://house9ja.com'}/admin/users`,
+        ).catch(() => {}),
+      )),
+    ).catch(() => {});
+
     return { status: 'success', data: { message: 'Registration successful. Please verify your email before signing in.' } };
   }
 

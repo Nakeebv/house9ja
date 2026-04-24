@@ -427,6 +427,27 @@ export function ChatInbox({ conversations, currentUserId, token }: ChatInboxProp
               </div>
             </div>
 
+            {/* Pinned property card */}
+            <div className="shrink-0 mx-4 mt-3 mb-1">
+              <a
+                href={`/property/${activeChat.propertyId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 rounded-xl border border-blue-500/20 bg-blue-500/8 px-4 py-2.5 hover:bg-blue-500/12 transition-colors"
+              >
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-500/15">
+                  <MapPin className="h-4 w-4 text-blue-400" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-semibold text-blue-200 truncate">{activeChat.property.title}</p>
+                  <p className="text-[11px] text-slate-400 truncate">
+                    {activeChat.property.city} · ₦{Number(activeChat.property.monthlyRent).toLocaleString()}
+                  </p>
+                </div>
+                <span className="shrink-0 text-[10px] text-blue-400/60 font-medium">View →</span>
+              </a>
+            </div>
+
             {/* Messages Area */}
             <div
               className="flex-1 overflow-y-auto px-4 py-4 space-y-2"

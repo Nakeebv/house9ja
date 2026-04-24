@@ -153,18 +153,33 @@ export default function AdminProperties() {
                 )}
 
                 <div className="mt-4 flex items-center gap-2">
-                  <Button
-                    asChild
-                    size="sm"
-                    variant="ghost"
-                    className="h-8 text-slate-400 hover:bg-slate-800 hover:text-white"
-                  >
+                  <Button asChild size="sm" variant="ghost" className="h-8 text-slate-400 hover:bg-slate-800 hover:text-white">
                     <Link href={`/property/${property.id}`} target="_blank">
                       <Eye className="mr-1.5 h-3.5 w-3.5" /> Preview
                     </Link>
                   </Button>
 
-                  {!property.isVerified ? (
+                  {(property as any).hasPendingEdits ? (
+                    <>
+                      <Button
+                        size="sm"
+                        className="h-8 flex-1 bg-blue-600 text-white hover:bg-blue-500"
+                        onClick={() => approve.mutate(property.id)}
+                        disabled={approve.isPending}
+                      >
+                        <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" /> Approve Changes
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-8 text-rose-400 hover:bg-rose-500/10"
+                        onClick={() => reject.mutate(property.id)}
+                        disabled={reject.isPending}
+                      >
+                        Reject
+                      </Button>
+                    </>
+                  ) : !property.isVerified ? (
                     <Button
                       size="sm"
                       className="h-8 flex-1 bg-emerald-600 text-white hover:bg-emerald-500"
@@ -181,18 +196,6 @@ export default function AdminProperties() {
                       disabled={reject.isPending}
                     >
                       <XCircle className="mr-1.5 h-3.5 w-3.5" /> Revoke
-                    </Button>
-                  )}
-
-                  {property.isVerified && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-8 text-rose-400 hover:bg-rose-500/10"
-                      onClick={() => reject.mutate(property.id)}
-                      disabled={reject.isPending}
-                    >
-                      Reject
                     </Button>
                   )}
                 </div>
