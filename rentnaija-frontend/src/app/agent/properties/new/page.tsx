@@ -22,6 +22,7 @@ const PROPERTY_TYPES = [
   { value: 'TERRACE', label: 'Terrace' },
   { value: 'MANSIONETTE', label: 'Mansionette' },
   { value: 'OFFICE', label: 'Office' },
+  { value: 'SHORTLET', label: 'Shortlet Apartment' },
 ]
 
 const FURNISHING_OPTIONS = [
@@ -62,6 +63,8 @@ export default function AgentAddListingPage() {
     furnishing: 'UNFURNISHED',
     latitude: '',
     longitude: '',
+    petAllowed: false,
+    maxGuests: '',
   })
 
   const set = (field: keyof typeof form) => (
@@ -167,6 +170,8 @@ export default function AgentAddListingPage() {
         longitude: form.longitude ? Number(form.longitude) : 0,
         images: uploadedImages,
         features: selectedAmenities,
+        petAllowed: form.petAllowed,
+        maxGuests: form.maxGuests ? Number(form.maxGuests) : undefined,
       })
       router.push('/agent/properties')
     } catch (err: any) {
@@ -279,6 +284,7 @@ export default function AgentAddListingPage() {
                 >
                   <option value="YEARLY">Per Year</option>
                   <option value="MONTHLY">Per Month</option>
+                  <option value="DAILY">Per Day</option>
                 </select>
               </div>
             </div>
@@ -400,6 +406,29 @@ export default function AgentAddListingPage() {
           {selectedAmenities.length > 0 && (
             <p className="mt-3 text-xs text-slate-400">{selectedAmenities.length} amenities selected</p>
           )}
+        </AdminPanel>
+
+        {/* Guest Policy */}
+        <AdminPanel title="Guest Policy" description="Specify rules for pets and guest capacity.">
+          <div className="grid gap-6 sm:grid-cols-2">
+            <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-900 px-4 py-3">
+              <div>
+                <p className="text-sm font-medium text-slate-200">Pets Allowed</p>
+                <p className="text-xs text-slate-500 mt-0.5">Allow tenants with pets</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setForm((prev) => ({ ...prev, petAllowed: !prev.petAllowed }))}
+                className={`relative h-6 w-11 rounded-full transition-colors ${form.petAllowed ? 'bg-violet-500' : 'bg-slate-700'}`}
+              >
+                <span className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${form.petAllowed ? 'translate-x-5' : 'translate-x-0'}`} />
+              </button>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-300">Max Guests Allowed <span className="text-slate-500">(optional)</span></label>
+              <Input type="number" min="1" value={form.maxGuests} onChange={set('maxGuests')} placeholder="e.g. 4" className="h-12 rounded-xl border-slate-800 bg-slate-900 text-white" />
+            </div>
+          </div>
         </AdminPanel>
 
         {/* Photos */}

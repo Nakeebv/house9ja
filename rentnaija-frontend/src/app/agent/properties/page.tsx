@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { PlusCircle, Search, Trash2, Eye, DoorClosed, DoorOpen } from 'lucide-react'
+import { PlusCircle, Search, Trash2, Eye, DoorClosed, DoorOpen, Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -97,12 +97,13 @@ export default function AgentPropertiesPage() {
                   <TableRow key={p.id} className="border-slate-800 hover:bg-slate-900/80">
                     <TableCell className="font-medium text-white max-w-[200px] truncate">{p.title}</TableCell>
                     <TableCell className="text-slate-400 whitespace-nowrap">{p.location}</TableCell>
-                    <TableCell className="text-slate-300 whitespace-nowrap">₦{p.price.toLocaleString()}/mo</TableCell>
+                    <TableCell className="text-slate-300 whitespace-nowrap">₦{p.price.toLocaleString()}/{p.priceType === 'DAILY' ? 'day' : p.priceType === 'MONTHLY' ? 'mo' : 'yr'}</TableCell>
                     <TableCell>
                       <div className="flex flex-col gap-1">
                         <AdminTag tone={p.isVerified ? 'success' : 'warning'}>
                           {p.isVerified ? 'Approved' : 'Pending'}
                         </AdminTag>
+                        {p.hasPendingEdits && <AdminTag tone="warning">Edit Pending</AdminTag>}
                         <AdminTag tone={p.status === 'rented' ? 'danger' : 'info'}>
                           {p.status === 'rented' ? 'Rented' : 'Available'}
                         </AdminTag>
@@ -115,6 +116,11 @@ export default function AgentPropertiesPage() {
                           className="text-slate-400 hover:bg-slate-800 hover:text-white" title="View listing">
                           <Link href={`/property/${p.id}`}><Eye className="h-4 w-4" /></Link>
                         </Button>
+                        <Link href={`/agent/properties/${p.id}/edit`}>
+                          <Button variant="ghost" size="icon" title="Edit listing" className="text-slate-400 hover:bg-slate-800 hover:text-white">
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                        </Link>
                         {p.status === 'rented' ? (
                           <Button variant="ghost" size="icon" title="Mark as available"
                             className="text-emerald-400 hover:bg-emerald-950 hover:text-emerald-300"

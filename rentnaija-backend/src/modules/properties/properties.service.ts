@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class PropertiesService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService, private notifications: NotificationsService) { }
 
   async getCityCounts() {
     const cities = ['Lagos', 'Abuja', 'Ibadan', 'Port Harcourt'];
@@ -140,11 +141,39 @@ export class PropertiesService {
   async update(id: string, userId: string, data: any) {
     const prop = await this.prisma.property.findUnique({ where: { id } });
     if (!prop) throw new NotFoundException('Property not found');
-    if (prop.landlordId !== userId) throw new ForbiddenException('Not your listing');
+    if (prop.landlordId !== userId && prop.agentId !== userId) throw new ForbiddenException('Not your listing');
 
+    // If already approved, store edits as pending — admin must re-approve
+    if (prop.isVerified) {
+      const safeData = { ...data };
+      delete safeData.isVerified;
+      delete safeData.isAvailable;
+      delete safeData.hasPendingEdits;
+      delete safeData.pendingData;
+
+      const updated = await this.prisma.property.update({
+        where: { id },
+        data: { pendingData: safeData, hasPendingEdits: true },
+      });
+
+      // Notify admins — find all admins
+      const admins = await this.prisma.user.findMany({ where: { role: 'ADMIN' } });
+      await Promise.all(admins.map((admin) =>
+        this.notifications.create(admin.id, {
+          title: '📝 Listing Edit Pending',
+          message: `"${prop.title}" has been edited and requires re-approval.`,
+          type: 'LISTING_APPROVED',
+          linkUrl: `/admin/properties`,
+        }).catch(() => {}),
+      ));
+
+      return updated;
+    }
+
+    // Not yet approved — update freely and re-queue for review
     return this.prisma.property.update({
       where: { id },
-      data,
+      data: { ...data, isVerified: false },
     });
   }
 

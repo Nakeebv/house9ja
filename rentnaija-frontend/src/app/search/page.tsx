@@ -281,7 +281,7 @@ export default function SearchPage() {
                             <p className="text-xl font-bold text-slate-900">
                               ₦{property.price.toLocaleString()}
                               <span className="text-sm font-normal text-slate-400">
-                                /{(property as any).priceType === 'MONTHLY' ? 'mo' : 'yr'}
+                                /{(property as any).priceType === 'DAILY' ? 'day' : (property as any).priceType === 'MONTHLY' ? 'mo' : 'yr'}
                               </span>
                             </p>
 

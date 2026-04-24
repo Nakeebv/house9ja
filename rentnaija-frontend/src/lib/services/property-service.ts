@@ -32,6 +32,10 @@ export function normalizeProperty(item: any): Property {
     status: item.isAvailable === false ? 'rented' : 'available',
     isVerified: item.isVerified ?? false,
     isFlagged: item.isFlagged ?? false,
+    petAllowed: item.petAllowed ?? false,
+    maxGuests: item.maxGuests ?? undefined,
+    hasPendingEdits: item.hasPendingEdits ?? false,
+    pendingData: item.pendingData ?? undefined,
     latitude: Number(item.latitude ?? 0),
     longitude: Number(item.longitude ?? 0),
     views: Number(item.views ?? 0),
@@ -117,8 +121,34 @@ export const propertyService = {
     longitude: number
     images?: string[]
     features?: string[]
+    petAllowed?: boolean
+    maxGuests?: number
   }): Promise<Property> {
     const response = await api.post<any>('/properties', data)
+    return normalizeProperty(response?.data ?? response)
+  },
+
+  async update(id: string, data: {
+    title?: string
+    description?: string
+    address?: string
+    state?: string
+    city?: string
+    area?: string
+    propertyType?: string
+    bedrooms?: number
+    bathrooms?: number
+    furnishing?: string
+    monthlyRent?: number
+    priceType?: string
+    latitude?: number
+    longitude?: number
+    images?: string[]
+    features?: string[]
+    petAllowed?: boolean
+    maxGuests?: number
+  }): Promise<Property> {
+    const response = await api.patch<any>(`/properties/${id}`, data)
     return normalizeProperty(response?.data ?? response)
   },
 

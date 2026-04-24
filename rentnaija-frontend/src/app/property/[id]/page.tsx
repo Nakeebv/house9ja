@@ -181,7 +181,7 @@ export default function PropertyDetailPage() {
   }
 
   const heroImage = property.images[0] ?? '/hero/img-a1.png'
-  const priceLabel = property.priceType === 'MONTHLY' ? '/mo' : '/yr'
+  const priceLabel = property.priceType === 'DAILY' ? '/day' : property.priceType === 'MONTHLY' ? '/mo' : '/yr'
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">

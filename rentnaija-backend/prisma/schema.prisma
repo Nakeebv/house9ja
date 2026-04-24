@@ -26,6 +26,7 @@ enum PropertyType {
   TERRACE
   MANSIONETTE
   OFFICE
+  SHORTLET
 }
 
 enum Furnishing {
@@ -175,6 +176,10 @@ model Property {
   features        String[]    @default([])
   landlordId      String
   agentId         String?
+  petAllowed      Boolean     @default(false)
+  maxGuests       Int?
+  pendingData     Json?
+  hasPendingEdits Boolean     @default(false)
   views           Int         @default(0)
   isVerified      Boolean     @default(false)
   isFlagged       Boolean     @default(false)

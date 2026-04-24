@@ -106,9 +106,17 @@ export class AdminService {
 
   async approveProperty(adminRole: string, id: string) {
     this.assertAdmin(adminRole);
+    const current = await this.prisma.property.findUnique({ where: { id } });
+    if (!current) throw new Error('Property not found');
+
+    // If there are pending edits, merge them into the live fields
+    const pendingMerge = current.hasPendingEdits && current.pendingData
+      ? { ...(current.pendingData as object), pendingData: null, hasPendingEdits: false }
+      : { pendingData: null, hasPendingEdits: false };
+
     const property = await this.prisma.property.update({
       where: { id },
-      data: { isVerified: true, isAvailable: true },
+      data: { isVerified: true, isAvailable: true, ...pendingMerge },
     });
     const ownerId = property.agentId ?? property.landlordId;
     await this.notifications.create(ownerId, {
@@ -122,6 +130,26 @@ export class AdminService {
 
   async rejectProperty(adminRole: string, id: string) {
     this.assertAdmin(adminRole);
+    const current = await this.prisma.property.findUnique({ where: { id } });
+    if (!current) throw new Error('Property not found');
+
+    // If rejecting pending edits, discard changes and keep original approved content
+    if (current.hasPendingEdits) {
+      const property = await this.prisma.property.update({
+        where: { id },
+        data: { pendingData: null, hasPendingEdits: false },
+      });
+      const ownerId = property.agentId ?? property.landlordId;
+      await this.notifications.create(ownerId, {
+        title: '❌ Edit Changes Rejected',
+        message: `Your proposed changes to "${property.title}" were rejected. The listing remains live with its previous content.`,
+        type: 'LISTING_REJECTED',
+        linkUrl: `/property/${property.id}`,
+      });
+      return property;
+    }
+
+    // Standard rejection of a new (unverified) listing
     const property = await this.prisma.property.update({
       where: { id },
       data: { isAvailable: false, isVerified: false },
@@ -131,7 +159,7 @@ export class AdminService {
       title: '❌ Listing Rejected',
       message: `Your listing "${property.title}" was not approved. Please review and resubmit.`,
       type: 'LISTING_REJECTED',
-      linkUrl: `/agent/properties`,
+      linkUrl: `/landlord/properties`,
     });
     return property;
   }

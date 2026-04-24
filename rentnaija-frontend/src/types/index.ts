@@ -40,12 +40,16 @@ export interface Property {
   furnishing: string
   images: string[]
   features: string[]
-  /** MONTHLY | YEARLY pricing model */
-  priceType: 'MONTHLY' | 'YEARLY'
+  /** DAILY | MONTHLY | YEARLY pricing model */
+  priceType: 'DAILY' | 'MONTHLY' | 'YEARLY'
   /** isAvailable mapped to 'available' | 'rented' */
   status: 'available' | 'rented'
   isVerified: boolean
   isFlagged: boolean
+  petAllowed: boolean
+  maxGuests?: number
+  hasPendingEdits?: boolean
+  pendingData?: Record<string, any>
   latitude: number
   longitude: number
   views: number

@@ -84,7 +84,7 @@ export function FeaturedListings() {
                   <p className="text-[22px] font-semibold tracking-[-0.015em] text-[#1d1d1f] dark:text-[#f5f5f7]">
                     ₦{p.price.toLocaleString()}
                     <span className="ml-1 text-sm font-normal text-[#6e6e73] dark:text-[#a1a1a6]">
-                      /{p.priceType === 'MONTHLY' ? 'mo' : 'yr'}
+                      /{p.priceType === 'DAILY' ? 'day' : p.priceType === 'MONTHLY' ? 'mo' : 'yr'}
                     </span>
                   </p>
 

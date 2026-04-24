@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { PlusCircle, Search, Trash2, DoorClosed, DoorOpen } from 'lucide-react'
+import { PlusCircle, Search, Trash2, DoorClosed, DoorOpen, Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -92,12 +92,15 @@ export default function LandlordPropertiesPage() {
                   <TableRow key={property.id} className="border-slate-800 hover:bg-slate-900/80">
                     <TableCell className="font-medium text-white max-w-[200px] truncate">{property.title}</TableCell>
                     <TableCell className="text-slate-400 whitespace-nowrap">{property.location}</TableCell>
-                    <TableCell className="text-slate-300 whitespace-nowrap">₦{property.price.toLocaleString()}/mo</TableCell>
+                    <TableCell className="text-slate-300 whitespace-nowrap">₦{property.price.toLocaleString()}/{property.priceType === 'DAILY' ? 'day' : property.priceType === 'MONTHLY' ? 'mo' : 'yr'}</TableCell>
                     <TableCell>
                       <div className="flex flex-col gap-1">
                         <AdminTag tone={property.isVerified ? 'success' : 'warning'}>
                           {property.isVerified ? 'Approved' : 'Pending'}
                         </AdminTag>
+                        {property.hasPendingEdits && (
+                          <AdminTag tone="warning">Edit Pending</AdminTag>
+                        )}
                         <AdminTag tone={property.status === 'rented' ? 'danger' : 'info'}>
                           {property.status === 'rented' ? 'Rented' : 'Available'}
                         </AdminTag>
@@ -106,6 +109,11 @@ export default function LandlordPropertiesPage() {
                     <TableCell className="text-center text-slate-400">{property.views}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1">
+                        <Link href={`/landlord/properties/${property.id}/edit`}>
+                          <Button variant="ghost" size="icon" title="Edit listing" className="text-slate-400 hover:bg-slate-800 hover:text-white">
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                        </Link>
                         {property.status === 'rented' ? (
                           <Button
                             variant="ghost"

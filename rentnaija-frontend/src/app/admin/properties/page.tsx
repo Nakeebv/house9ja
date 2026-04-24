@@ -11,7 +11,7 @@ import { AdminPageHeader, AdminTag } from '@/components/admin/admin-shell'
 import { adminService } from '@/lib/services/admin-service'
 import Link from 'next/link'
 
-type Filter = 'ALL' | 'PENDING' | 'APPROVED'
+type Filter = 'ALL' | 'PENDING' | 'APPROVED' | 'CHANGES'
 
 export default function AdminProperties() {
   const [search, setSearch] = useState('')
@@ -35,16 +35,18 @@ export default function AdminProperties() {
 
   const filtered = useMemo(() => {
     let list = properties
-    if (filter === 'PENDING') list = list.filter((p) => !p.isVerified)
-    if (filter === 'APPROVED') list = list.filter((p) => p.isVerified)
+    if (filter === 'PENDING') list = list.filter((p) => !p.isVerified && !(p as any).hasPendingEdits)
+    if (filter === 'APPROVED') list = list.filter((p) => p.isVerified && !(p as any).hasPendingEdits)
+    if (filter === 'CHANGES') list = list.filter((p) => (p as any).hasPendingEdits)
     if (search) list = list.filter((p) => [p.title, p.location, p.address].join(' ').toLowerCase().includes(search.toLowerCase()))
     return list
   }, [properties, filter, search])
 
   const counts = {
     all: properties.length,
-    pending: properties.filter((p) => !p.isVerified).length,
-    approved: properties.filter((p) => p.isVerified).length,
+    pending: properties.filter((p) => !p.isVerified && !(p as any).hasPendingEdits).length,
+    approved: properties.filter((p) => p.isVerified && !(p as any).hasPendingEdits).length,
+    changes: properties.filter((p) => (p as any).hasPendingEdits).length,
   }
 
   return (
@@ -56,15 +58,15 @@ export default function AdminProperties() {
       />
 
       {/* Stats bar */}
-      <div className="grid grid-cols-3 gap-3">
-        {([['ALL', counts.all, 'text-white', 'border-slate-700'], ['PENDING', counts.pending, 'text-amber-300', 'border-amber-500/30'], ['APPROVED', counts.approved, 'text-emerald-300', 'border-emerald-500/30']] as const).map(([key, count, color, border]) => (
+      <div className="grid grid-cols-4 gap-3">
+        {([['ALL', counts.all, 'text-white', 'border-slate-700'], ['PENDING', counts.pending, 'text-amber-300', 'border-amber-500/30'], ['APPROVED', counts.approved, 'text-emerald-300', 'border-emerald-500/30'], ['CHANGES', counts.changes, 'text-blue-300', 'border-blue-500/30']] as const).map(([key, count, color, border]) => (
           <button
             key={key}
             onClick={() => setFilter(key)}
             className={`rounded-2xl border px-4 py-3 text-left transition ${filter === key ? 'bg-slate-800 ' + border : 'border-slate-800 bg-slate-900/40 hover:bg-slate-800/60'}`}
           >
             <p className={`text-2xl font-bold ${color}`}>{count}</p>
-            <p className="mt-0.5 text-xs text-slate-400 capitalize">{key === 'ALL' ? 'Total' : key.toLowerCase()}</p>
+            <p className="mt-0.5 text-xs text-slate-400 capitalize">{key === 'ALL' ? 'Total' : key === 'CHANGES' ? 'Edit Requests' : key.toLowerCase()}</p>
           </button>
         ))}
       </div>
@@ -105,10 +107,13 @@ export default function AdminProperties() {
                     <Building2 className="h-10 w-10" />
                   </div>
                 )}
-                <div className="absolute right-2 top-2">
+                <div className="absolute right-2 top-2 flex flex-col gap-1 items-end">
                   <AdminTag tone={property.isVerified ? 'success' : 'warning'}>
                     {property.isVerified ? 'Approved' : 'Pending'}
                   </AdminTag>
+                  {(property as any).hasPendingEdits && (
+                    <AdminTag tone="info">Edit Request</AdminTag>
+                  )}
                 </div>
               </div>
 
@@ -119,8 +124,19 @@ export default function AdminProperties() {
                   {property.location ?? property.address}
                 </div>
                 <div className="mt-1 text-sm font-medium text-emerald-400">
-                  ₦{property.price?.toLocaleString()}<span className="text-xs text-slate-500">/yr</span>
+                  ₦{property.price?.toLocaleString()}<span className="text-xs text-slate-500">/{(property as any).priceType === 'DAILY' ? 'day' : (property as any).priceType === 'MONTHLY' ? 'mo' : 'yr'}</span>
                 </div>
+                {(property as any).hasPendingEdits && (property as any).pendingData && (
+                  <div className="mt-2 rounded-lg border border-blue-500/20 bg-blue-500/5 px-3 py-2 text-xs text-blue-300 space-y-0.5">
+                    <p className="font-semibold text-blue-200 mb-1">Proposed changes:</p>
+                    {Object.entries((property as any).pendingData as Record<string, any>)
+                      .filter(([k]) => !['images', 'features', 'latitude', 'longitude'].includes(k))
+                      .slice(0, 4)
+                      .map(([k, v]) => (
+                        <p key={k}><span className="text-slate-400">{k}:</span> {String(v)}</p>
+                      ))}
+                  </div>
+                )}
                 {(property as any).landlord && (
                   <div className="mt-2 flex items-center gap-1.5">
                     <UserAvatar
