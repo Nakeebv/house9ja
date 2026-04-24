@@ -2,6 +2,7 @@ import { Injectable, ForbiddenException, NotFoundException, Logger } from '@nest
 import { PrismaService } from '../../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { EmailService } from '../email/email.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class AdminService {
@@ -111,8 +112,8 @@ export class AdminService {
 
     // If there are pending edits, merge them into the live fields
     const pendingMerge = current.hasPendingEdits && current.pendingData
-      ? { ...(current.pendingData as object), pendingData: null, hasPendingEdits: false }
-      : { pendingData: null, hasPendingEdits: false };
+      ? { ...(current.pendingData as object), pendingData: Prisma.DbNull, hasPendingEdits: false }
+      : { pendingData: Prisma.DbNull, hasPendingEdits: false };
 
     const property = await this.prisma.property.update({
       where: { id },
@@ -137,7 +138,7 @@ export class AdminService {
     if (current.hasPendingEdits) {
       const property = await this.prisma.property.update({
         where: { id },
-        data: { pendingData: null, hasPendingEdits: false },
+        data: { pendingData: Prisma.DbNull, hasPendingEdits: false },
       });
       const ownerId = property.agentId ?? property.landlordId;
       await this.notifications.create(ownerId, {
