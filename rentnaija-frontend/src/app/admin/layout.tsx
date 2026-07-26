@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useEffect, ReactNode } from 'react'
+import { useEffect } from 'react'
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout'
 import { useAuth } from '@/lib/auth-context'
 import {
@@ -29,7 +29,7 @@ const ADMIN_MENU = [
   },
 ]
 
-export default function AdminLayout({ children }: { children: ReactNode }) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const { user, isLoading } = useAuth()
 

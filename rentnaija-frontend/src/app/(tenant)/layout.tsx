@@ -1,6 +1,5 @@
 'use client'
 
-import { ReactNode } from 'react'
 import { usePathname } from 'next/navigation'
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout'
 import { RequireAuth } from '@/components/auth/require-auth'
@@ -35,7 +34,7 @@ const TENANT_MENU = [
 // Routes inside (tenant) that are public — they use root layout without dashboard chrome
 const PUBLIC_PATHS = ['/property']
 
-export default function TenantLayout({ children }: { children: ReactNode }) {
+export default function TenantLayout({ children }: { children: React.ReactNode }) {
   const { user } = useAuth()
   const pathname = usePathname()
 

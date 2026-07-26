@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout'
 import { useAuth } from '@/lib/auth-context'
@@ -30,7 +30,7 @@ const LANDLORD_MENU = [
   },
 ]
 
-export default function LandlordLayout({ children }: { children: ReactNode }) {
+export default function LandlordLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const { user, isLoading } = useAuth()
 
