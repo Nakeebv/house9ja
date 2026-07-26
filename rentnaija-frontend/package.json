@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev --port 3000",
     "deploy": "npx @opennextjs/cloudflare deploy",
-    "build": "npx @opennextjs/cloudflare build",
+    "build": "next build",
+    "preview": "npx @opennextjs/cloudflare preview",
     "start": "next start -p ${PORT:-3000}",
     "lint": "next lint",
     "type-check": "tsc --noEmit -p tsconfig.typecheck.json"
