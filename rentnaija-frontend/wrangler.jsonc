@@ -1,0 +1,10 @@
+{
+  "name": "rentnaija-frontend",
+  "main": ".worker/index.js",
+  "compatibility_date": "2024-09-23",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".worker/assets",
+    "binding": "ASSETS"
+  }
+}
