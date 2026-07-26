@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "description": "RentNaija - P2P Property Rental Platform for Nigeria",
   "private": true,
+  "workspaces": [
+    "rentnaija-backend",
+    "rentnaija-frontend"
+  ],
   "scripts": {
     "dev": "concurrently \"cd rentnaija-backend && npm run dev\" \"cd rentnaija-frontend && npm run dev\"",
     "dev:backend": "cd rentnaija-backend && npm run dev",
